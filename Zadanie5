@@ -104,10 +104,18 @@ int main (int argc, char *argv[])
 		if( z == '\n' ) {
 			if( st == 0 )
 			continue;
-			r = r + 1;		
+			r = r + 1;
+			if( r >= MAX_SIZE ) {
+				printf("Prekrocena maximalna veľkosť bludiska\n");
+				return 0;
+			}
 			s = st;		
 			st = 0;		
 			continue;
+		}
+		if( st >= MAX_SIZE ) {
+			printf("Prekrocena maximalna veľkost bludiska\n");
+			return 0;
 		}
 		pole[r][st] = z;	
 		st = st + 1;	
