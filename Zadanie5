@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define MAX_SIZE 200	
+#define MAX_SIZE 200	// maximalna veľkosť bludiska
 
-int riesenie_najdene = 0;	
-int sirka, dlzka;	
+int riesenie_najdene = 0;	// ak sa nájde riešenie, tak bude tam hodnota 1
+int sirka, dlzka;	// šírka a dĺžka bludiska
 
-int najdi_vchod_zhora ( char pole[][MAX_SIZE] ) {	
+int najdi_vchod_zhora ( char pole[][MAX_SIZE] ) {	// prehľadáva znaky v prvom riadku ... ak nájde ".", vráti jeho pozíciu v riadku
 	int n;
 	for( n = 0; n < sirka ; n++ ) {
 		if( pole[0][n] == '.' )
@@ -15,7 +15,7 @@ int najdi_vchod_zhora ( char pole[][MAX_SIZE] ) {
 	return -1;
 }
 
-int najdi_vchod_zlava ( char pole[][MAX_SIZE] ) {	
+int najdi_vchod_zlava ( char pole[][MAX_SIZE] ) {	// prehľadávava znaky v prvom stĺpci ... ak nájde ".", vráti jeho pozíciu v stĺpci
 	int n;
 	for( n = 0; n < dlzka ; n++ ) {
 		if( pole[n][0] == '.' )
@@ -28,7 +28,7 @@ void vypis_riesenie ( char pole[][MAX_SIZE] ) {
 	int n, m;
 	for( n = 0; n < dlzka; n++ ) {	
 		for( m = 0; m < sirka; m++ ) {	
-			printf("%c", pole[n][m]);	
+			printf("%c", pole[n][m]);	// vypíše jednotlivé políčka
 		}
 		printf("\n");
 	} 
@@ -36,18 +36,18 @@ void vypis_riesenie ( char pole[][MAX_SIZE] ) {
 
 void hladaj_cestu ( char pole[][MAX_SIZE], int x, int y ) {
 		
-	pole[y][x] = '*'; 
+	pole[y][x] = '*'; // označí aktuálne políčko hviezdičkou
 		
-	if( x+1 >= sirka || y+1 >= dlzka ) {	
+	if( x+1 >= sirka || y+1 >= dlzka ) {	// ak je mimo bludiska, našlo sa riešenie
 		riesenie_najdene = 1;
-		vypis_riesenie( pole );		
+		vypis_riesenie( pole );		// vypíše riešenie na vstup
 		return;
 	}
 	
-	if ( riesenie_najdene == 1 )	
+	if ( riesenie_najdene == 1 )	// ak najde riešenie, už nebude hľadať
 		return;
 
-	if( pole[y+1][x] == '.' )	
+	if( pole[y+1][x] == '.' )	// hľadaj v susedních políčkach bodku, ak nájde, hľadá tam cestu
 		hladaj_cestu ( pole, x, y+1 );
 	if( y > 0 && pole[y-1][x] == '.' )
 		hladaj_cestu ( pole, x, y-1 );
@@ -55,83 +55,76 @@ void hladaj_cestu ( char pole[][MAX_SIZE], int x, int y ) {
 		hladaj_cestu ( pole, x+1, y );
 	if( x > 0 && pole[y][x-1] == '.' )
 		hladaj_cestu ( pole, x-1, y );
-	pole[y][x] = '.';	
+	pole[y][x] = '.';	// ak nenájde ".", aj aktuálne políčko vráti do stavu "."
 	return;
 }
 
 void najdi_riesenie ( char pole[][MAX_SIZE] ){
-	int vchod = najdi_vchod_zhora( pole );	
+	int vchod = najdi_vchod_zhora( pole );	// hľadá vchod do bludiska na hornej hrane
 
-	if( vchod != -1 ) {	
+	if( vchod != -1 ) {	// ak nájde, hľadá cestu od toho políčka
 		hladaj_cestu( pole, vchod, 0 );
 	}
 	else { 
-		vchod = najdi_vchod_zlava( pole );	
+		vchod = najdi_vchod_zlava( pole );	// hľadá vchod do bludiska na ľavej hrane
 		if( vchod != -1 ) 
-			hladaj_cestu( pole, 0, vchod ); 
+			hladaj_cestu( pole, 0, vchod ); // ak nájde, hľadá cestu od toho políčka
 		else {
-			printf("Nenaslo vchod do bludiska!\n");
+			printf("Nenašlo vchod do bludiska!\n");
 			return;
 		}
 	}
-
 }
-
-
 
 int main (int argc, char *argv[])
 {
 	char znak;
-	char pole[MAX_SIZE][MAX_SIZE]; 
+	char pole[MAX_SIZE][MAX_SIZE]; // deklaruje sa pole znakov s veľkosťou 200x200
 	int riadok = 0, stlpec = 0;
 	
-	while( read(STDIN_FILENO, &znak, 1) > 0) { 
-		if( znak == '-' ) {	
+	while( read(STDIN_FILENO, &znak, 1) > 0) { // načíta znaky zo štandardného vstupu a zapisuje do premennej "znak"
+		if( znak == '-' ) {	// ak narazí na znak "-", ukončí načítavanie bludiska
 			if( riesenie_najdene == 0 ) {
-				dlzka = riadok;		
+				dlzka = riadok;		// dĺžka bludiska sa rovná poslednej hodnote riadka navýšenej o jeden
 				najdi_riesenie( pole );
 				if( riesenie_najdene == 0 ) {
-					printf("Riesenie tohto bludiska nebolo najdene!\n");
-					riesenie_najdene = 1;			
+					printf("Riešenie tohto bludiska nebolo nájdené!\n");
+					riesenie_najdene = 1;	// len aby preskočilo zalomenie riadku			
 				}
 				printf("----\n");
-				riadok = 0;	
-				stlpec = 0;	
+				riadok = 0;	// nastaví hodnotu riadka na nulu pre ďaľšie bludisko
+				stlpec = 0;	// nastaví hodnotu st=lpca na nulu pre ďaľšie bludisko
 				continue;			
 			}
 			else continue;
 		}
-		if( riesenie_najdene == 1 ) {	
+		if( riesenie_najdene == 1 ) {	// preskočí zalomenie riadku a ide na nasledovné bludisko
 			riesenie_najdene = 0;
 			continue;
 		}
-		
 		if( znak == '\n' ) {
 			if( stlpec == 0 )
 				continue;
-			riadok = riadok + 1;		
+			riadok = riadok + 1;	// ak znakom je zalomenie riadku, zväčší hodnotu premennej "riadok" o 1	
 			if( riadok >= MAX_SIZE ) {
-				printf("Prekrocena maximalna veľkosť bludiska\n");
+				printf("Prekročená maximálna veľkosť bludiska\n");
 				return 0;
 			}
-			sirka = stlpec;		
-			stlpec = 0;		
+			sirka = stlpec;		// premenna "sirka" vyjadruje počet znakov v jednom riadku, teda šírku pola
+			stlpec = 0;		// premenna "stlpec" vyjadruje stĺpec v bludisku, na začiatku riadku je nulová
 			continue;
 		}	
-
 		if( stlpec >= MAX_SIZE ) {
-			printf("Prekrocena maximalna veľkost bludiska\n");
+			printf("Prekročená maximálna veľkosť bludiska\n");
 			return 0;
 		}
-
-		pole[riadok][stlpec] = znak;	
-		stlpec = stlpec + 1;	
+		pole[riadok][stlpec] = znak;	// do pola pre daný riadok a stĺpec zapíše znak zo vstupu
+		stlpec = stlpec + 1;	// každý ďaľší znak predstavuje ďaľší stĺpec, preto sa hodnota premennej "stlpec" stále zväčší o jednu 
 		continue;
 	}
 	dlzka = riadok;
-	najdi_riesenie( pole );	
+	najdi_riesenie( pole );	// nájdenie riešenia posledného bludiska 
 	if( riesenie_najdene == 0 ) 
-		printf("Riesenie tohto bludiska nebolo najdene!\n");
+		printf("Riešenie tohto bludiska nebolo nájdené!\n");
 	return 0;
 }
-
