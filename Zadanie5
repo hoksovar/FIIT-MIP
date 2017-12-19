@@ -119,3 +119,4 @@ int main (int argc, char *argv[])
 		printf("Riesenie tohto bludiska nebolo najdene!\n");
 	return 0;
 }
+
